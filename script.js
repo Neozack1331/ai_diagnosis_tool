@@ -633,39 +633,56 @@ function selectRandomQuestions() {
         .slice(0, 20);
 }
 
-const aiTypes = {
-    "クリエイティブ": {
-        description: "あなたの創造性を活かせるAIツール",
+// 4つのユーザータイプの定義
+const userTypes = {
+    "イノベーター型": {
+        baseCategory: "クリエイティブ",
+        description: "あなたは新しいアイデアを生み出すことに長けた「イノベーター型」です。創造性が高く、常に新しい可能性を探求することを好みます。既存の枠組みにとらわれない思考ができ、独創的な解決策を見つけることができます。",
+        explanation: "あなたの回答から、創造的な思考や新しいアイデアを生み出すことに高い関心があることがわかりました。既存の枠組みにとらわれない発想力と、新しいものを生み出す意欲が特徴的です。",
         recommendations: [
-            "DALL-E - 画像生成AI",
-            "Jasper - コンテンツ生成AI",
-            "Midjourney - アート生成AI"
+            "DALL-E - 画像生成AI（あなたの創造性をビジュアル化するのに最適）",
+            "Jasper - コンテンツ生成AI（独創的な文章作成をサポート）",
+            "Midjourney - アート生成AI（あなたのアイデアを芸術作品に変換）"
         ]
     },
-    "効率重視": {
-        description: "効率的な作業をサポートするAIツール",
+    "エフィシェント型": {
+        baseCategory: "効率重視",
+        description: "あなたは効率と生産性を重視する「エフィシェント型」です。時間管理に優れ、最小限の労力で最大の成果を出すことを得意としています。自動化や最適化を好み、効率的なワークフローを構築することに関心があります。",
+        explanation: "あなたの回答から、効率的な作業プロセスや時間管理を重視する傾向が強いことがわかりました。無駄を省き、合理的に物事を進めることを好む特性が顕著です。",
         recommendations: [
-            "Notion - プロジェクト管理AI",
-            "Gmail - AIメールアシスタント",
-            "Trello - タスク管理AI"
+            "Notion - プロジェクト管理AI（効率的なタスク管理と情報整理が可能）",
+            "Gmail - AIメールアシスタント（コミュニケーションの効率化をサポート）",
+            "Trello - タスク管理AI（視覚的で効率的なタスク管理を実現）"
         ]
     },
-    "学習型": {
-        description: "新しい知識を学ぶのに最適なAIツール",
+    "ナレッジシーカー型": {
+        baseCategory: "学習型",
+        description: "あなたは知識を追求する「ナレッジシーカー型」です。新しい情報を学び、深く理解することに喜びを感じます。詳細な説明を好み、複雑な問題に取り組むことを楽しむ傾向があります。常に知識を更新し、自己成長を続けることを重視しています。",
+        explanation: "あなたの回答から、新しい知識を獲得することや、詳細な情報を理解することに強い関心があることがわかりました。学習意欲が高く、知的好奇心が旺盛な特性が見られます。",
         recommendations: [
-            "ChatGPT - ジェネラルAIアシスタント",
-            "DeepSeek - 検索エンジンAI",
-            "Wolfram Alpha - 知識ベースAI"
+            "ChatGPT - ジェネラルAIアシスタント（幅広い知識を得るのに最適）",
+            "DeepSeek - 検索エンジンAI（深い知識探索をサポート）",
+            "Wolfram Alpha - 知識ベースAI（専門的な情報を正確に提供）"
         ]
     },
-    "チーム型": {
-        description: "チームワークをサポートするAIツール",
+    "コラボレーター型": {
+        baseCategory: "チーム型",
+        description: "あなたは協力と共創を重視する「コラボレーター型」です。他者との協働を通じて価値を生み出すことに長けています。コミュニケーション能力が高く、多様な意見を尊重し、チームの力を最大化することができます。",
+        explanation: "あなたの回答から、他者との協力やコミュニケーションを重視する傾向が強いことがわかりました。チームワークを大切にし、多様な視点を取り入れることを好む特性が顕著です。",
         recommendations: [
-            "Slack - チームコミュニケーションAI",
-            "Microsoft Teams - ミーティングAI",
-            "Asana - チームプロジェクト管理AI"
+            "Slack - チームコミュニケーションAI（効果的なチーム連携をサポート）",
+            "Microsoft Teams - ミーティングAI（リモートでの協働作業に最適）",
+            "Asana - チームプロジェクト管理AI（チーム全体の進捗管理に役立つ）"
         ]
     }
+};
+
+// 元のAIタイプとの互換性のためのマッピング
+const aiTypes = {
+    "クリエイティブ": userTypes["イノベーター型"],
+    "効率重視": userTypes["エフィシェント型"],
+    "学習型": userTypes["ナレッジシーカー型"],
+    "チーム型": userTypes["コラボレーター型"]
 };
 
 // DOM要素
@@ -780,6 +797,7 @@ function showResults() {
     // 診断ロジックを実装
     const score = calculateScore(answers);
     const aiType = determineAiType(score);
+    const userType = determineUserType(aiType);
     
     // 各タイプの最大スコアを計算
     const maxPossibleScore = 5 * 3; // 5問の各カテゴリで最大値は3
@@ -792,14 +810,21 @@ function showResults() {
         team: Math.round((score.team / maxPossibleScore) * 100)
     };
     
+    // ユーザータイプの説明を取得
+    const typeExplanation = userTypes[userType].explanation;
+    
     // スコア表示を追加
     const scoreHTML = `
+        <div class="user-type-result animate__animated animate__fadeIn">
+            <h3>あなたは「${userType}」です</h3>
+            <p class="user-type-description">${userTypes[userType].description}</p>
+        </div>
         <div class="score-summary animate__animated animate__fadeIn">
-            <p>あなたの診断結果:</p>
+            <p>診断結果の詳細:</p>
             <div class="score-bars">
                 <div class="score-bar">
                     <div class="score-bar-header">
-                        <span>学習型</span>
+                        <span>ナレッジシーカー型</span>
                         <span class="score-percentage" id="learning-percentage">0%</span>
                     </div>
                     <div class="bar-container">
@@ -808,7 +833,7 @@ function showResults() {
                 </div>
                 <div class="score-bar">
                     <div class="score-bar-header">
-                        <span>クリエイティブ</span>
+                        <span>イノベーター型</span>
                         <span class="score-percentage" id="creative-percentage">0%</span>
                     </div>
                     <div class="bar-container">
@@ -817,7 +842,7 @@ function showResults() {
                 </div>
                 <div class="score-bar">
                     <div class="score-bar-header">
-                        <span>効率重視</span>
+                        <span>エフィシェント型</span>
                         <span class="score-percentage" id="efficient-percentage">0%</span>
                     </div>
                     <div class="bar-container">
@@ -826,7 +851,7 @@ function showResults() {
                 </div>
                 <div class="score-bar">
                     <div class="score-bar-header">
-                        <span>チーム型</span>
+                        <span>コラボレーター型</span>
                         <span class="score-percentage" id="team-percentage">0%</span>
                     </div>
                     <div class="bar-container">
@@ -835,14 +860,17 @@ function showResults() {
                 </div>
             </div>
         </div>
-        <p class="result-description animate__animated animate__fadeIn animate__delay-1s">${aiTypes[aiType].description}</p>
+        <div class="result-explanation animate__animated animate__fadeIn animate__delay-1s">
+            <h3>なぜこの結果になったのか？</h3>
+            <p>${typeExplanation}</p>
+        </div>
     `;
     
     resultText.innerHTML = scoreHTML;
     aiRecommendations.innerHTML = `
-        <h3 class="animate__animated animate__fadeIn animate__delay-1s">おすすめのAIツール:</h3>
+        <h3 class="animate__animated animate__fadeIn animate__delay-1s">あなたにおすすめのAIツール:</h3>
         <div class="animate__animated animate__fadeIn animate__delay-1s">
-            ${aiTypes[aiType].recommendations.map(ai => 
+            ${userTypes[userType].recommendations.map(ai => 
                 `<div class="ai-recommendation">${ai}</div>`
             ).join('')}
         </div>
@@ -955,6 +983,18 @@ function determineAiType(score) {
     );
     
     return scoreMap[maxType];
+}
+
+function determineUserType(aiType) {
+    // AIタイプからユーザータイプへの変換
+    const typeMap = {
+        "学習型": "ナレッジシーカー型",
+        "クリエイティブ": "イノベーター型",
+        "効率重視": "エフィシェント型",
+        "チーム型": "コラボレーター型"
+    };
+    
+    return typeMap[aiType];
 }
 
 // イベントリスナーの設定
