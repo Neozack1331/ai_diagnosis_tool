@@ -627,10 +627,32 @@ const allQuestions = [
 
 // 診断開始時に質問をランダムに選択する関数
 function selectRandomQuestions() {
-    return allQuestions
-        .map(question => ({ ...question }))
-        .sort(() => 0.5 - Math.random())
-        .slice(0, 20);
+    // 各カテゴリの質問を分類
+    const questionsByCategory = {
+        "学習型": [],
+        "クリエイティブ": [],
+        "効率重視": [],
+        "チーム型": []
+    };
+    
+    // 質問をカテゴリ別に振り分ける
+    allQuestions.forEach(question => {
+        questionsByCategory[question.category].push({ ...question });
+    });
+    
+    // 各カテゴリごとにランダムに選択
+    const selectedQuestions = [];
+    
+    // 各カテゴリから同数の質問を選択
+    Object.values(questionsByCategory).forEach(categoryQuestions => {
+        // カテゴリごとにシャッフル
+        const shuffled = categoryQuestions.sort(() => 0.5 - Math.random());
+        // 各カテゴリから5問ずつ選択
+        selectedQuestions.push(...shuffled.slice(0, 5));
+    });
+    
+    // 最終的な質問リストをシャッフル
+    return selectedQuestions.sort(() => 0.5 - Math.random());
 }
 
 // 4つのユーザータイプの定義
@@ -807,12 +829,28 @@ function showResults() {
     // 各タイプの最大スコアを計算
     const maxPossibleScore = 5 * 3; // 5問の各カテゴリで最大値は3
     
-    // スコアのパーセンテージを計算（100%を超えないように制限）
+    // 一旦全てのスコアのパーセンテージを計算
+    const rawPercentages = {
+        learning: Math.round((score.learning / maxPossibleScore) * 100),
+        creative: Math.round((score.creative / maxPossibleScore) * 100),
+        efficient: Math.round((score.efficient / maxPossibleScore) * 100),
+        team: Math.round((score.team / maxPossibleScore) * 100)
+    };
+    
+    // 最大スコアを見つける
+    const maxScore = Math.max(
+        rawPercentages.learning,
+        rawPercentages.creative,
+        rawPercentages.efficient,
+        rawPercentages.team
+    );
+    
+    // 最大スコアを100%にし、他は比例配分する
     const percentages = {
-        learning: Math.min(100, Math.round((score.learning / maxPossibleScore) * 100)),
-        creative: Math.min(100, Math.round((score.creative / maxPossibleScore) * 100)),
-        efficient: Math.min(100, Math.round((score.efficient / maxPossibleScore) * 100)),
-        team: Math.min(100, Math.round((score.team / maxPossibleScore) * 100))
+        learning: Math.round((rawPercentages.learning / maxScore) * 100),
+        creative: Math.round((rawPercentages.creative / maxScore) * 100),
+        efficient: Math.round((rawPercentages.efficient / maxScore) * 100),
+        team: Math.round((rawPercentages.team / maxScore) * 100)
     };
     
     // ユーザーの回答から具体的な特性を分析
