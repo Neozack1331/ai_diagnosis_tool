@@ -643,7 +643,8 @@ const userTypes = {
             "DALL-E - 画像生成AI（あなたの創造性をビジュアル化するのに最適）",
             "Jasper - コンテンツ生成AI（独創的な文章作成をサポート）",
             "Midjourney - アート生成AI（あなたのアイデアを芸術作品に変換）"
-        ]
+        ],
+        image: "code.jpg"
     },
     "エフィシェント型": {
         baseCategory: "効率重視",
@@ -653,7 +654,8 @@ const userTypes = {
             "Notion - プロジェクト管理AI（効率的なタスク管理と情報整理が可能）",
             "Gmail - AIメールアシスタント（コミュニケーションの効率化をサポート）",
             "Trello - タスク管理AI（視覚的で効率的なタスク管理を実現）"
-        ]
+        ],
+        image: "feel.jpg"
     },
     "ナレッジシーカー型": {
         baseCategory: "学習型",
@@ -663,7 +665,8 @@ const userTypes = {
             "ChatGPT - ジェネラルAIアシスタント（幅広い知識を得るのに最適）",
             "DeepSeek - 検索エンジンAI（深い知識探索をサポート）",
             "Wolfram Alpha - 知識ベースAI（専門的な情報を正確に提供）"
-        ]
+        ],
+        image: "seeker.jpg"
     },
     "コラボレーター型": {
         baseCategory: "チーム型",
@@ -673,7 +676,8 @@ const userTypes = {
             "Slack - チームコミュニケーションAI（効果的なチーム連携をサポート）",
             "Microsoft Teams - ミーティングAI（リモートでの協働作業に最適）",
             "Asana - チームプロジェクト管理AI（チーム全体の進捗管理に役立つ）"
-        ]
+        ],
+        image: "fun.jpg"
     }
 };
 
@@ -696,6 +700,7 @@ const progressText = document.getElementById('progress-text');
 const backBtn = document.getElementById('back-btn');
 const resultSection = document.getElementById('result-section');
 const resultText = document.getElementById('result-text');
+const resultImageContainer = document.getElementById('result-image-container');
 const aiRecommendations = document.getElementById('ai-recommendations');
 const restartBtn = document.getElementById('restart-btn');
 const homeBtn = document.getElementById('home-btn');
@@ -813,46 +818,62 @@ function showResults() {
     // ユーザータイプの説明を取得
     const typeExplanation = userTypes[userType].explanation;
     
-    // スコア表示を追加
-    const scoreHTML = `
-        <div class="user-type-result animate__animated animate__fadeIn">
-            <h3>あなたは「${userType}」です</h3>
-            <p class="user-type-description">${userTypes[userType].description}</p>
+    // 結果を表示
+    quizSection.classList.add('hidden');
+    resultSection.classList.remove('hidden');
+    
+    // ユーザータイプの結果を表示
+    const typeInfo = userTypes[userType];
+    
+    // 結果画像を表示（点滅しないように通常のクラスを使用）
+    const resultImageHTML = `
+        <img src="img/${typeInfo.image}" alt="${userType}" class="result-image">
+    `;
+    resultImageContainer.innerHTML = resultImageHTML;
+    
+    let resultHTML = `
+        <div class="user-type-result" style="border-left-color: ${getColorForType(typeInfo.baseCategory)}">
+            <h3>${userType}</h3>
+            <p class="user-type-description">${typeInfo.description}</p>
         </div>
-        <div class="score-summary animate__animated animate__fadeIn">
-            <p>診断結果の詳細:</p>
+        
+        <div class="score-summary">
+            <h3>あなたのAIタイプ分析</h3>
             <div class="score-bars">
                 <div class="score-bar">
                     <div class="score-bar-header">
                         <span>ナレッジシーカー型</span>
-                        <span class="score-percentage" id="learning-percentage">0%</span>
+                        <span id="learning-percentage" class="score-percentage">0%</span>
                     </div>
                     <div class="bar-container">
                         <div class="bar" id="learning-bar"></div>
                     </div>
                 </div>
+                
                 <div class="score-bar">
                     <div class="score-bar-header">
                         <span>イノベーター型</span>
-                        <span class="score-percentage" id="creative-percentage">0%</span>
+                        <span id="creative-percentage" class="score-percentage">0%</span>
                     </div>
                     <div class="bar-container">
                         <div class="bar" id="creative-bar"></div>
                     </div>
                 </div>
+                
                 <div class="score-bar">
                     <div class="score-bar-header">
                         <span>エフィシェント型</span>
-                        <span class="score-percentage" id="efficient-percentage">0%</span>
+                        <span id="efficient-percentage" class="score-percentage">0%</span>
                     </div>
                     <div class="bar-container">
                         <div class="bar" id="efficient-bar"></div>
                     </div>
                 </div>
+                
                 <div class="score-bar">
                     <div class="score-bar-header">
                         <span>コラボレーター型</span>
-                        <span class="score-percentage" id="team-percentage">0%</span>
+                        <span id="team-percentage" class="score-percentage">0%</span>
                     </div>
                     <div class="bar-container">
                         <div class="bar" id="team-bar"></div>
@@ -860,54 +881,56 @@ function showResults() {
                 </div>
             </div>
         </div>
-        <div class="result-explanation animate__animated animate__fadeIn animate__delay-1s">
-            <h3>なぜこの結果になったのか？</h3>
-            <p>${typeExplanation}</p>
-        </div>
-    `;
-    
-    resultText.innerHTML = scoreHTML;
-    aiRecommendations.innerHTML = `
-        <h3 class="animate__animated animate__fadeIn animate__delay-1s">あなたにおすすめのAIツール:</h3>
-        <div class="animate__animated animate__fadeIn animate__delay-1s">
-            ${userTypes[userType].recommendations.map(ai => 
-                `<div class="ai-recommendation">${ai}</div>`
-            ).join('')}
-        </div>
-    `;
-    
-    quizSection.classList.add('hidden');
-    resultSection.classList.remove('hidden');
-    
-    // グラフのアニメーションを実行
-    setTimeout(() => {
-        // バーの幅をアニメーションで表示
-        document.getElementById('learning-bar').style.width = `${percentages.learning}%`;
-        document.getElementById('creative-bar').style.width = `${percentages.creative}%`;
-        document.getElementById('efficient-bar').style.width = `${percentages.efficient}%`;
-        document.getElementById('team-bar').style.width = `${percentages.team}%`;
         
-        // パーセンテージを表示
+        <div class="result-explanation">
+            <h3>あなたの特性</h3>
+            <p>${typeInfo.explanation}</p>
+        </div>
+    `;
+    
+    resultText.innerHTML = resultHTML;
+    
+    // AIツールのレコメンデーションを表示
+    let recommendationsHTML = `
+        <h3>おすすめのAIツール</h3>
+        <div class="ai-recommendation-list">
+    `;
+    
+    typeInfo.recommendations.forEach(rec => {
+        recommendationsHTML += `
+            <div class="ai-recommendation" style="border-left-color: ${getColorForType(typeInfo.baseCategory)}">
+                ${rec}
+            </div>
+        `;
+    });
+    
+    recommendationsHTML += `</div>`;
+    aiRecommendations.innerHTML = recommendationsHTML;
+    
+    // アニメーションでバーを表示
+    setTimeout(() => {
+        document.getElementById('learning-bar').style.width = `${percentages.learning}%`;
+        document.getElementById('learning-percentage').textContent = `${percentages.learning}%`;
+        document.getElementById('learning-percentage').classList.add('visible');
+        
         setTimeout(() => {
-            document.getElementById('learning-percentage').textContent = `${percentages.learning}%`;
-            document.getElementById('learning-percentage').classList.add('visible');
+            document.getElementById('creative-bar').style.width = `${percentages.creative}%`;
+            document.getElementById('creative-percentage').textContent = `${percentages.creative}%`;
+            document.getElementById('creative-percentage').classList.add('visible');
             
             setTimeout(() => {
-                document.getElementById('creative-percentage').textContent = `${percentages.creative}%`;
-                document.getElementById('creative-percentage').classList.add('visible');
+                document.getElementById('efficient-bar').style.width = `${percentages.efficient}%`;
+                document.getElementById('efficient-percentage').textContent = `${percentages.efficient}%`;
+                document.getElementById('efficient-percentage').classList.add('visible');
                 
                 setTimeout(() => {
-                    document.getElementById('efficient-percentage').textContent = `${percentages.efficient}%`;
-                    document.getElementById('efficient-percentage').classList.add('visible');
-                    
-                    setTimeout(() => {
-                        document.getElementById('team-percentage').textContent = `${percentages.team}%`;
-                        document.getElementById('team-percentage').classList.add('visible');
-                    }, 200);
-                }, 200);
-            }, 200);
-        }, 500);
-    }, 300);
+                    document.getElementById('team-bar').style.width = `${percentages.team}%`;
+                    document.getElementById('team-percentage').textContent = `${percentages.team}%`;
+                    document.getElementById('team-percentage').classList.add('visible');
+                }, 300);
+            }, 300);
+        }, 300);
+    }, 500);
 }
 
 function restartQuiz() {
@@ -995,6 +1018,18 @@ function determineUserType(aiType) {
     };
     
     return typeMap[aiType];
+}
+
+// 各タイプに対応する色を返す関数
+function getColorForType(category) {
+    const colorMap = {
+        "学習型": "#2196F3",
+        "クリエイティブ": "#FF9800",
+        "効率重視": "#4CAF50",
+        "チーム型": "#9C27B0"
+    };
+    
+    return colorMap[category] || "#333";
 }
 
 // イベントリスナーの設定

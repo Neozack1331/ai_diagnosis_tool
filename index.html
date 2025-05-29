@@ -13,33 +13,7 @@
         <div id="top-section" class="top-section">
             <h1 class="animate__animated animate__fadeInDown">あなたに合うAIを診断</h1>
             <div class="robot-image animate__animated animate__bounceIn animate__delay-1s">
-                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                    <!-- ロボットの頭 -->
-                    <rect x="50" y="30" width="100" height="80" rx="15" fill="#4CAF50" />
-                    <!-- 目 -->
-                    <circle cx="80" cy="60" r="10" fill="white" />
-                    <circle cx="120" cy="60" r="10" fill="white" />
-                    <circle cx="80" cy="60" r="5" fill="black" />
-                    <circle cx="120" cy="60" r="5" fill="black" />
-                    <!-- 口 -->
-                    <rect x="75" y="85" width="50" height="10" rx="5" fill="white" />
-                    <!-- アンテナ -->
-                    <line x1="100" y1="30" x2="100" y2="10" stroke="#4CAF50" stroke-width="5" />
-                    <circle cx="100" cy="10" r="5" fill="#FF9800" />
-                    <!-- 体 -->
-                    <rect x="60" y="110" width="80" height="60" rx="10" fill="#2196F3" />
-                    <!-- 腕 -->
-                    <rect x="30" y="120" width="30" height="10" rx="5" fill="#2196F3" />
-                    <rect x="140" y="120" width="30" height="10" rx="5" fill="#2196F3" />
-                    <!-- 足 -->
-                    <rect x="70" y="170" width="20" height="20" rx="5" fill="#9C27B0" />
-                    <rect x="110" y="170" width="20" height="20" rx="5" fill="#9C27B0" />
-                    <!-- パネル -->
-                    <rect x="75" y="120" width="50" height="20" rx="5" fill="#1976D2" />
-                    <circle cx="85" cy="130" r="5" fill="#FF9800" />
-                    <circle cx="100" cy="130" r="5" fill="#FF9800" />
-                    <circle cx="115" cy="130" r="5" fill="#FF9800" />
-                </svg>
+                <img src="img/normal.jpg" alt="AI診断ツール" class="main-image">
             </div>
             <p class="description animate__animated animate__fadeIn animate__delay-2s">AI初心者のあなたに最適なAIツールを診断します。<br>20の質問に答えて、あなたのAIタイプを見つけましょう！</p>
             <button id="start-btn" class="start-btn animate__animated animate__pulse animate__infinite">診断を始める</button>
@@ -68,6 +42,9 @@
         <!-- 結果セクション -->
         <div id="result-section" class="result-section hidden">
             <h2 class="animate__animated animate__fadeInDown">診断結果</h2>
+            <div id="result-image-container" class="result-image-container">
+                <!-- 画像は動的に挿入されます -->
+            </div>
             <div id="result-text"></div>
             <div id="ai-recommendations"></div>
             <div class="result-buttons">
