@@ -14,13 +14,20 @@ body {
 
 .container {
     max-width: 800px;
-    margin: 2rem auto;
-    padding: 2rem;
+    margin: 1rem auto;
+    padding: 1.5rem;
     background-color: white;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     overflow: hidden;
     position: relative;
+}
+
+@media (max-width: 480px) {
+    .container {
+        margin: 0.5rem auto;
+        padding: 1rem;
+    }
 }
 
 .colorful-bg {
@@ -48,17 +55,36 @@ h1 {
 /* トップページのスタイル */
 .top-section {
     text-align: center;
-    padding: 2rem 0;
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(100vh - 3rem);
+}
+
+@media (max-width: 480px) {
+    .top-section {
+        min-height: calc(100vh - 2rem);
+        padding: 0.5rem 0;
+    }
 }
 
 .robot-image {
-    width: 250px;
-    height: 250px;
-    margin: 2rem auto;
+    width: 220px;
+    height: 220px;
+    margin: 1.5rem auto;
     overflow: hidden;
     border-radius: 15px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     position: relative;
+}
+
+@media (max-width: 480px) {
+    .robot-image {
+        width: 180px;
+        height: 180px;
+        margin: 1rem auto;
+    }
 }
 
 .main-image {
@@ -110,8 +136,16 @@ h1 {
 
 .description {
     font-size: 1.2rem;
-    margin-bottom: 2rem;
-    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+    .description {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+    }
 }
 
 .start-btn {
@@ -435,18 +469,49 @@ button:disabled {
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     text-align: left;
+    position: relative;
+}
+
+.result-explanation p {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #555;
+}
+
+.result-explanation strong {
+    color: #333;
+    font-weight: 700;
+}
+
+.highlight-box {
+    background-color: rgba(76, 175, 80, 0.1);
+    border-left: 3px solid #4CAF50;
+    padding: 0.8rem;
+    margin: 1rem 0;
+    border-radius: 0 5px 5px 0;
+}
+
+.secondary-traits {
+    background-color: rgba(33, 150, 243, 0.1);
+    border-left: 3px solid #2196F3;
+    padding: 0.8rem;
+    margin: 1rem 0;
+    border-radius: 0 5px 5px 0;
+}
+
+.reliability-note {
+    background-color: rgba(156, 39, 176, 0.1);
+    border-left: 3px solid #9C27B0;
+    padding: 0.8rem;
+    margin: 1rem 0;
+    border-radius: 0 5px 5px 0;
+    font-style: italic;
 }
 
 .result-explanation h3 {
     margin-bottom: 1rem;
     color: #333;
     font-size: 1.2rem;
-}
-
-.result-explanation p {
-    font-size: 1.05rem;
-    line-height: 1.6;
-    color: #555;
 }
 
 .ai-recommendations {

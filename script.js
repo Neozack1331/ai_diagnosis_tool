@@ -807,12 +807,12 @@ function showResults() {
     // 各タイプの最大スコアを計算
     const maxPossibleScore = 5 * 3; // 5問の各カテゴリで最大値は3
     
-    // スコアのパーセンテージを計算
+    // スコアのパーセンテージを計算（100%を超えないように制限）
     const percentages = {
-        learning: Math.round((score.learning / maxPossibleScore) * 100),
-        creative: Math.round((score.creative / maxPossibleScore) * 100),
-        efficient: Math.round((score.efficient / maxPossibleScore) * 100),
-        team: Math.round((score.team / maxPossibleScore) * 100)
+        learning: Math.min(100, Math.round((score.learning / maxPossibleScore) * 100)),
+        creative: Math.min(100, Math.round((score.creative / maxPossibleScore) * 100)),
+        efficient: Math.min(100, Math.round((score.efficient / maxPossibleScore) * 100)),
+        team: Math.min(100, Math.round((score.team / maxPossibleScore) * 100))
     };
     
     // ユーザーの回答から具体的な特性を分析
@@ -831,18 +831,27 @@ function showResults() {
     `;
     resultImageContainer.innerHTML = resultImageHTML;
     
+    // ユーザータイプに応じた絵文字を設定
+    const typeEmojis = {
+        "ナレッジシーカー型": "🧠",
+        "イノベーター型": "💡",
+        "エフィシェント型": "⚡",
+        "コラボレーター型": "👥"
+    };
+    
+    // 結果表示用HTMLを生成
     let resultHTML = `
         <div class="user-type-result" style="border-left-color: ${getColorForType(typeInfo.baseCategory)}">
-            <h3>${userType}</h3>
+            <h3>${typeEmojis[userType]} ${userType} ${typeEmojis[userType]}</h3>
             <p class="user-type-description">${typeInfo.description}</p>
         </div>
         
         <div class="score-summary">
-            <h3>あなたのAIタイプ分析</h3>
+            <h3>📊 あなたのAIタイプ分析</h3>
             <div class="score-bars">
                 <div class="score-bar">
                     <div class="score-bar-header">
-                        <span>ナレッジシーカー型</span>
+                        <span>🧠 ナレッジシーカー型</span>
                         <span id="learning-percentage" class="score-percentage">0%</span>
                     </div>
                     <div class="bar-container">
@@ -852,7 +861,7 @@ function showResults() {
                 
                 <div class="score-bar">
                     <div class="score-bar-header">
-                        <span>イノベーター型</span>
+                        <span>💡 イノベーター型</span>
                         <span id="creative-percentage" class="score-percentage">0%</span>
                     </div>
                     <div class="bar-container">
@@ -862,7 +871,7 @@ function showResults() {
                 
                 <div class="score-bar">
                     <div class="score-bar-header">
-                        <span>エフィシェント型</span>
+                        <span>⚡ エフィシェント型</span>
                         <span id="efficient-percentage" class="score-percentage">0%</span>
                     </div>
                     <div class="bar-container">
@@ -872,7 +881,7 @@ function showResults() {
                 
                 <div class="score-bar">
                     <div class="score-bar-header">
-                        <span>コラボレーター型</span>
+                        <span>👥 コラボレーター型</span>
                         <span id="team-percentage" class="score-percentage">0%</span>
                     </div>
                     <div class="bar-container">
@@ -883,8 +892,8 @@ function showResults() {
         </div>
         
         <div class="result-explanation">
-            <h3>あなたの特性</h3>
-            <p>${detailedExplanation}</p>
+            <h3>✨ あなたの特性</h3>
+            <p>${formatDetailedExplanation(detailedExplanation)}</p>
         </div>
     `;
     
@@ -1030,6 +1039,72 @@ function getColorForType(category) {
     };
     
     return colorMap[category] || "#333";
+}
+
+// 詳細な説明文をフォーマットして可読性を向上させる関数
+function formatDetailedExplanation(text) {
+    // 特定のキーワードを太字にする
+    text = text.replace(/(特に|強い関心|得意|好む|重視|特性|特徴|多面的|能力)/g, '<strong>$1</strong>');
+    
+    // センテンスを段落に分ける
+    text = text.replace(/\. /g, '.<br><br>');
+    text = text.replace(/\.　/g, '.<br><br>');
+    text = text.replace(/\u3002/g, '\u3002<br><br>');
+    
+    // 特定のパターンに絵文字を追加（絵文字の数を減らす）
+    // 各カテゴリの最初の出現のみに絵文字を追加
+    let hasAddedLearningEmoji = false;
+    let hasAddedCreativeEmoji = false;
+    let hasAddedEfficientEmoji = false;
+    let hasAddedTeamEmoji = false;
+    
+    // 学習型の絵文字を一度だけ追加
+    text = text.replace(/(新しい知識|学習意欲|知的好奇心)/g, function(match) {
+        if (!hasAddedLearningEmoji) {
+            hasAddedLearningEmoji = true;
+            return '🧠 ' + match;
+        }
+        return match;
+    });
+    
+    // 創造型の絵文字を一度だけ追加
+    text = text.replace(/(新しいアイデア|創造的|発想力)/g, function(match) {
+        if (!hasAddedCreativeEmoji) {
+            hasAddedCreativeEmoji = true;
+            return '💡 ' + match;
+        }
+        return match;
+    });
+    
+    // 効率型の絵文字を一度だけ追加
+    text = text.replace(/(効率|時間管理|自動化|無駄)/g, function(match) {
+        if (!hasAddedEfficientEmoji) {
+            hasAddedEfficientEmoji = true;
+            return '⚡ ' + match;
+        }
+        return match;
+    });
+    
+    // チーム型の絵文字を一度だけ追加
+    text = text.replace(/(チーム|協力|コミュニケーション|他者)/g, function(match) {
+        if (!hasAddedTeamEmoji) {
+            hasAddedTeamEmoji = true;
+            return '👥 ' + match;
+        }
+        return match;
+    });
+    
+    // 特徴的なパターンにスタイルを適用
+    text = text.replace(/(特に、あなたは)/g, '<div class="highlight-box">$1');
+    text = text.replace(/(これは典型的な.*の特性です。)/g, '$1</div>');
+    
+    // セカンダリ特性の説明をハイライト
+    text = text.replace(/(また、.*の特性も持ち合わせていることから.*。)/g, '<div class="secondary-traits">$1</div>');
+    
+    // 信頼性の説明をハイライト
+    text = text.replace(/(多くの質問に回答いただいたため.*。)/g, '<div class="reliability-note">$1</div>');
+    
+    return text;
 }
 
 // ユーザーの回答から具体的な特性を分析して詳細な説明を生成する関数
