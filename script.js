@@ -815,8 +815,8 @@ function showResults() {
         team: Math.round((score.team / maxPossibleScore) * 100)
     };
     
-    // ユーザータイプの説明を取得
-    const typeExplanation = userTypes[userType].explanation;
+    // ユーザーの回答から具体的な特性を分析
+    const detailedExplanation = generateDetailedExplanation(answers, userType);
     
     // 結果を表示
     quizSection.classList.add('hidden');
@@ -884,7 +884,7 @@ function showResults() {
         
         <div class="result-explanation">
             <h3>あなたの特性</h3>
-            <p>${typeInfo.explanation}</p>
+            <p>${detailedExplanation}</p>
         </div>
     `;
     
@@ -1030,6 +1030,144 @@ function getColorForType(category) {
     };
     
     return colorMap[category] || "#333";
+}
+
+// ユーザーの回答から具体的な特性を分析して詳細な説明を生成する関数
+function generateDetailedExplanation(answers, userType) {
+    // ユーザータイプの基本説明を取得
+    const baseExplanation = userTypes[userType].explanation;
+    
+    // 各カテゴリの高スコアの回答を抽出
+    const highScoreAnswers = answers.filter(answer => answer.value >= 2);
+    
+    // カテゴリ別に高スコアの回答を整理
+    const categorizedAnswers = {
+        "学習型": highScoreAnswers.filter(a => a.category === "学習型"),
+        "クリエイティブ": highScoreAnswers.filter(a => a.category === "クリエイティブ"),
+        "効率重視": highScoreAnswers.filter(a => a.category === "効率重視"),
+        "チーム型": highScoreAnswers.filter(a => a.category === "チーム型")
+    };
+    
+    // ユーザータイプに対応するカテゴリを取得
+    const primaryCategory = userTypes[userType].baseCategory;
+    const primaryAnswers = categorizedAnswers[primaryCategory];
+    
+    // 特徴的な回答を抽出して説明文を生成
+    let detailedExplanation = baseExplanation;
+    
+    // ユーザータイプに応じた追加説明を生成
+    if (userType === "ナレッジシーカー型") {
+        if (primaryAnswers.length > 0) {
+            // 学習型の特徴的な回答を抽出
+            const learningTraits = [];
+            
+            if (primaryAnswers.some(a => a.question.includes("新しい技術") || a.question.includes("新しい知識"))) {
+                learningTraits.push("新しい知識や技術を積極的に学ぶことを好む");
+            }
+            
+            if (primaryAnswers.some(a => a.question.includes("詳細") || a.question.includes("複雑"))) {
+                learningTraits.push("詳細な情報や複雑な問題に取り組むことを好む");
+            }
+            
+            if (primaryAnswers.some(a => a.question.includes("自己学習") || a.question.includes("情報収集"))) {
+                learningTraits.push("自分から積極的に情報を収集し、学習する傾向が強い");
+            }
+            
+            // 特徴が抽出された場合、説明文に追加
+            if (learningTraits.length > 0) {
+                detailedExplanation += " 特に、あなたは" + learningTraits.join("、また") + "という特徴が高スコアの回答から明確に表れています。これは典型的なナレッジシーカー型の特性です。";
+            }
+        }
+    } else if (userType === "イノベーター型") {
+        if (primaryAnswers.length > 0) {
+            // クリエイティブ型の特徴的な回答を抽出
+            const creativeTraits = [];
+            
+            if (primaryAnswers.some(a => a.question.includes("新しいアイデア") || a.question.includes("創造的"))) {
+                creativeTraits.push("新しいアイデアを生み出し、創造的な解決策を考えることが得意");
+            }
+            
+            if (primaryAnswers.some(a => a.question.includes("枚組み") || a.question.includes("思考"))) {
+                creativeTraits.push("既存の枚組みにとらわれない柔軟な思考ができる");
+            }
+            
+            if (primaryAnswers.some(a => a.question.includes("アート") || a.question.includes("デザイン") || a.question.includes("視覚的"))) {
+                creativeTraits.push("アートやデザインなどの視覚的な表現に強い関心を持つ");
+            }
+            
+            // 特徴が抽出された場合、説明文に追加
+            if (creativeTraits.length > 0) {
+                detailedExplanation += " 特に、あなたは" + creativeTraits.join("、また") + "という特徴が高スコアの回答から明確に表れています。これは典型的なイノベーター型の特性です。";
+            }
+        }
+    } else if (userType === "エフィシェント型") {
+        if (primaryAnswers.length > 0) {
+            // 効率重視型の特徴的な回答を抽出
+            const efficientTraits = [];
+            
+            if (primaryAnswers.some(a => a.question.includes("効率") || a.question.includes("作業効率"))) {
+                efficientTraits.push("効率的な作業を非常に重視している");
+            }
+            
+            if (primaryAnswers.some(a => a.question.includes("スケジュール") || a.question.includes("時間管理"))) {
+                efficientTraits.push("スケジュール管理や時間管理が得意");
+            }
+            
+            if (primaryAnswers.some(a => a.question.includes("自動化") || a.question.includes("システム化"))) {
+                efficientTraits.push("自動化やシステム化に強い関心を持ち、無駄を省くことを重視する");
+            }
+            
+            // 特徴が抽出された場合、説明文に追加
+            if (efficientTraits.length > 0) {
+                detailedExplanation += " 特に、あなたは" + efficientTraits.join("、また") + "という特徴が高スコアの回答から明確に表れています。これは典型的なエフィシェント型の特性です。";
+            }
+        }
+    } else if (userType === "コラボレーター型") {
+        if (primaryAnswers.length > 0) {
+            // チーム型の特徴的な回答を抽出
+            const teamTraits = [];
+            
+            if (primaryAnswers.some(a => a.question.includes("チーム") || a.question.includes("協力"))) {
+                teamTraits.push("チームでの作業や協力を非常に重視している");
+            }
+            
+            if (primaryAnswers.some(a => a.question.includes("コミュニケーション") || a.question.includes("他者"))) {
+                teamTraits.push("他者とのコミュニケーション能力が高く、共同作業を好む");
+            }
+            
+            if (primaryAnswers.some(a => a.question.includes("意見") || a.question.includes("尊重"))) {
+                teamTraits.push("他者の意見を尊重し、多様な視点を取り入れることができる");
+            }
+            
+            // 特徴が抽出された場合、説明文に追加
+            if (teamTraits.length > 0) {
+                detailedExplanation += " 特に、あなたは" + teamTraits.join("、また") + "という特徴が高スコアの回答から明確に表れています。これは典型的なコラボレーター型の特性です。";
+            }
+        }
+    }
+    
+    // 他のカテゴリの高スコアの特徴を追加
+    const secondaryCategories = Object.keys(categorizedAnswers).filter(cat => cat !== primaryCategory && categorizedAnswers[cat].length > 0);
+    
+    if (secondaryCategories.length > 0) {
+        const categoryNameMap = {
+            "学習型": "ナレッジシーカー型",
+            "クリエイティブ": "イノベーター型",
+            "効率重視": "エフィシェント型",
+            "チーム型": "コラボレーター型"
+        };
+        
+        const secondaryCategoryNames = secondaryCategories.map(cat => categoryNameMap[cat]);
+        
+        detailedExplanation += ` また、${secondaryCategoryNames.join("と")}の特性も持ち合わせていることから、多面的な能力を発揮できる可能性があります。`;
+    }
+    
+    // 回答数に基づいた信頼性の説明を追加
+    if (answers.length >= 15) {
+        detailedExplanation += " 多くの質問に回答いただいたため、この診断結果の信頼性は高いと言えます。";
+    }
+    
+    return detailedExplanation;
 }
 
 // イベントリスナーの設定
